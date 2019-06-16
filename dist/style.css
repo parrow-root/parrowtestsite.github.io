@@ -1,0 +1,656 @@
+/* basé et très largement adapté depuis cette démo https://codepen.io/jkantner/pen/KQPdXK */
+*,
+*:before,
+*:after {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+:root {
+font-size: 1vw;
+--cardW: 20vw;
+--cardH: 20vw;
+--cardZInc: 0.5em;
+--gap: 1.5em;
+--ttxt: 0.5em;
+}
+/* relatif à la fenetre de présentation, au texte du message (caché, pas toujours utile) */
+a:not(#message):not(#pdf) {
+text-decoration: none;
+color: white;
+
+}
+
+#message {
+position: relative;
+color: blue;
+font-size: 0.3em;
+}
+
+body {
+background-attachment: fixed;
+font: 1em "Open Sans", sans-serif;
+height: 100vh;
+width: 100vw;
+overflow-x: hidden;
+position: sticky;
+}
+
+/* Classe relative au header (nom, numéro mail, etc) */
+.titre {
+position: fixed;
+display: block;
+flex-wrap: wrap;
+font-family: 'Rubik mono one', system-ui;
+transform: rotateX(45deg) rotateY(0deg) rotateZ(-45deg) translateZ(11px);
+transform-style: preserve-3d;
+z-index: 0;
+background-color: none;
+background-size: 100% 100%;
+transition: all 0.3s;
+height: 5%;
+bottom: 60vh;
+left: 6vw;
+}
+
+#nom:hover {
+transition: all 0.5s;
+text-shadow: #FFFFFF 1px 1px, #FFFFFF -1px 1px, #FFFFFF -1px -1px, #FFFFFF 1px -1px, -2px 2px 0, -4px 4px 0, -6px 6px 0, -8px 8px 0, -10px 10px 0, -12px 12px 0, -14px 14px 0, -16px 16px 0, -18px 18px 0, -20px 20px 0, -22px 22px 0, -24px 24px 0, -26px 26px 0, -28px 28px 0, -30px 30px 0, -32px 32px 0, -34px 34px 0;
+}
+
+#nom {
+position: absolute;
+margin-top: 0vw;
+margin-left: 0vw;
+color: black;
+background-color: none;
+transition: 0.5s;
+font-size: calc(var(--ttxt)*2.5);
+text-shadow: #FFFFFF 1px 1px, #FFFFFF -1px 1px, #FFFFFF -1px -1px, #FFFFFF 1px -1px, -2px 2px 0, -4px 4px 0, -6px 6px 0;
+cursor: pointer;
+}
+/* gère le texte "Design/motion design" */
+#dg:hover {
+transition: all 0.5s;
+text-shadow: #FFFFFF 1px 1px, #FFFFFF -1px 1px, #FFFFFF -1px -1px, #FFFFFF 1px -1px, -2px 2px 0, -2px 4px 0, -3px 3px 0, -4px 4px 0, -5px 5px 0
+}
+
+#dg {
+text-align: right;
+color: black;
+Position: relative;
+background-color: white;
+border: 2px solid #FFF;
+transition: all 0.5s;
+font-size: calc(var(--ttxt) * 1);
+margin-top: 10vh;
+margin-right: 0vw;
+border-bottom: 4px dashed black;
+white-space: nowrap;
+overflow: hidden;
+}
+/* gère le numéro de tel et le mail */
+#num:hover {
+transition: all 0.5s;
+box-shadow: -1px 1px 0 #000, -2px 2px 0 #000, -3px 3px 0 #000, -4px 4px 0 #000, -5px 5px 0 #000, -6px 6px 0 #000, -7px 7px 0 #000, -8px 8px 0 #000, -9px 9px 0 #000, -10px 10px 0 #000, -11px 11px 0 #000;
+}
+
+#num {
+transition: all 0.5s;
+margin-top: -10vw;
+margin-left: 0vw;
+font-size: 1.2vw;
+position: relative;
+border: 5px solid black;
+color: white;
+background-color: black;
+}
+
+/* Grid */
+/* .card gère l'ensemble de la grille, .stack permet de gérer individuellement chaque pile/projet */
+.cards,
+.stack {
+transform-style: preserve-3d;
+}
+/* gère le texte header de la grille ainsi que le fond blanc de celle ci */
+.portfolio {
+text-align: center;
+width: 100%;
+height: 40em;
+font: 1em "Rubik Mono One", sans-serif;
+font-size: 1.1em;
+text-color: black;
+z-index: 0;
+outline: 50px solid white;
+position: absolute;
+background-color: white;
+background-size: 100% 100%;
+color: #000;
+transition: all 0.3s;
+transform: translateZ(-10px);
+top: calc(-1% - var(--gap)*2);
+opacity: 1;
+}
+
+.stack {
+display: block;
+position: relative;
+}
+
+.cards {
+--scroll: 100px;
+display: grid;
+grid-template: repeat(4);
+grid-gap: var(--gap);
+position: absolute;
+top: 35%;
+left: 60%;
+margin: auto;
+transform: translate(-20%, calc(-50% + var(--scroll))) rotateX(45deg) rotateZ(45deg) translateY(calc(50% - var(--scroll)));
+z-index: 1;
+cursor: pointer;
+}
+/* gère les textes sur les vignettes de projets */
+.contents {
+font-family: sans-serif, system-ui;
+color: white;
+font-size: calc(var(--ttxt) * 0.95);
+line-height: 1.25;
+-webkit-font-smoothing: antialiased;
+}
+/* gère spécifiquement les sous titres sur les vignettes */
+.contents h2 {
+color: #aff;
+font-size: 2em;
+font-weight: 400;
+margin-bottom: 0.25em;
+}
+
+.contents span {
+margin-right: 0.75em;
+}
+
+
+/* Card hover */
+
+.stack:hover .top,
+.stack:focus .top {
+transition: all 0.5s;
+transform: translateZ(calc(var(--cardZInc)*4))rotateX(-20deg);
+transform-origin: center bottom;
+z-index: 2;
+}
+
+.stack:hover .shadow,
+.stack:focus .shadow {
+filter: blur(5px);
+-webkit-filter: blur(5px);
+transform-origin: center bottom;
+height: 80%;
+transform: translateY(20%);
+}
+
+/* propriétés des cartes */
+
+.card {
+background-color: black;
+background-size: 100% 100%;
+box-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2) inset;
+padding: 0.75em;
+position: absolute;
+transition: all 0.3s;
+width: 100%;
+height: 100%;
+}
+/* haut de la pile de carte (image) */
+.top {
+transform: translateZ(10px);
+z-index: 15;
+}
+/* ombre portée des cartes */
+.shadow {
+background: #000;
+filter: blur(2px);
+-webkit-filter: blur(2px);
+opacity: 0.2;
+}
+/* id qui gère le nom du projet pour chaque vignette */
+#projets {
+background-color: rgba(0, 0, 0, 0.5);
+display: inline;
+outline: 2px solid rgba(0, 0, 0, 0.5);
+}
+/* class qui gère le type du projet pour chaque vignette */
+/* il y a une class et une id pour une bonne raison mais je ne sais plus laquelle */
+
+.categorie {
+margin-top: 0.5vh;
+font-size: 0.7em;
+background-color: rgba(0, 0, 0, 0.5);
+outline: 2px solid rgba(0, 0, 0, 0.5);
+position: absolute;
+}
+/* classe qui gère les fenetres détaillées de chaque projet (quisuisje est la fenetre de présentation quand on clique sur le nom/prénom et est une variante de fenetre détaillée de projet) */
+.quisuisje,
+.zoom {
+position: fixed;
+padding: 1.75em;
+outline: 2.5em solid ;
+background-color: black;
+color: white;
+margin-left: 15vw;
+margin-top: -1200px;
+width: 70vw;
+height: 80vh;
+transform: translateZ(1000px);
+z-index: 99;
+transition: all 0.3s;
+white-space: normal;
+font-size: calc(var(--ttxt) * 0.75);
+box-shadow: 0px 0px 1000px 50vh rgba(256, 256, 256, 0.0);
+}
+
+/* contient le titre, les images, le texte des fenêtres */
+.projetcontainer {
+width: 100%;
+height: 100%;
+outline: 0px solid red;
+}
+/* gère les images des fenêtres */
+.projetpics img {
+max-width: 100%;
+max-height: 100%;
+}
+/* gère le texte de la fenêtre de présentation et des fenêtres détaillées de projets */
+.texteqjs,
+.texteprojet {
+position: relative;
+width: 20vw;
+float: right;
+padding-top: calc(var(--gap)*1);
+font-size: 0.9em;
+}
+
+.texteqjs {
+width: 50vw;
+float: left;
+}
+/* gère les images dans les fenêtres détaillées */
+.projetpics {
+width: 60%;
+height: 90%;
+padding-top: calc(var(--gap)*1);
+}
+/* ça c'est mystère, ça date de la démo */
+iframe {
+width: 60%;
+height: 30vw;
+padding-top: calc(var(--gap)*1);
+}
+
+/* honnêtement je ne sais aps si cette ligne sert encore a qqchose mais peur de casser un truc */
+.zoom:nth-of-type(1) {
+outline: 2.5em solid rgba(255, 192, 203, 0.9);
+}
+/* gère la fenêtre de présentation */
+#quisuisje {
+background-color: white;
+color: black;
+outline: 2.5em solid rgba(255, 240, 130, 0.9);
+}
+/* class qui permet l'apparition des fenetres détaillées via le JS (en réalité toutes les fenetres sont cachées en haut de l'écran et chargées dès l'aterrissage sur le site, y'a surement mieux mais jsais aps faire) */
+.appear {
+margin-top: 7vh;
+box-shadow: 0px 0px 100px 50vh rgba(256, 256, 256, 0.8);
+}
+/* même chose mais spécifiquement pour la fenetre de présentation, car celle ci n'ets pas liée a la card  grid donc j'ai du la séparer completement */
+.appearqsj {
+margin-top: 6vh;
+box-shadow: 20px 20px 100px 50vh rgba(0, 0, 0, 0.8);
+}
+/* gère les boutons X servant a fermer les fenetres */
+[class^="closingX"],
+.close-button {
+margin-right:-1vw;
+margin-top:-1vw;
+border-radius: 10vh;
+font-weight: 0;
+font-size: 1em;
+border: 0.1em solid white;
+float: right;
+text-align: center;
+width: 1.6em;
+color: white;
+opacity:0.4;
+transition: all ease 0.3s;
+
+
+}
+[class^="closingX"]:hover,
+.close-button:hover {
+transition: all ease 0.3s;
+opacity:1;
+cursor: pointer;
+
+}
+/* bouton X mais pour la fenetre quisuisje */
+.closingX13{
+color:black;
+}
+/* gère les diaporamas */
+.slideshow {
+padding-top: calc(var(--gap)*1);
+overflow: hidden;
+height: 90%;
+width: 60%;
+margin-left: 2.5vw;
+}
+
+.slide-wrapper {
+width: 500%;
+transition: all 0.3s;
+}
+
+.slide1 {
+margin-left: 0px;
+}
+
+.slide2 {
+margin-left: -40vw;
+}
+
+.slide3 {
+margin-left: -80.2vw;
+}
+
+.slide4 {
+margin-left: -120.2vw;
+}
+
+.slide {
+border: 2px solid rgba(255, 240, 130, 0);
+float: left;
+height: 60vh;
+width: 40vw;
+}
+
+.slide:nth-child(1) {
+background: #D93B65;
+background: rgba(0, 0, 0, 0);
+}
+
+.slide-number img {
+float: left;
+max-width: 40vw;
+max-height: 60vh;
+width: auto;
+height: auto;
+}
+
+.slide-number {
+color: #000;
+text-align: center;
+font-size: 10em;
+width: 40vw;
+height: auto;
+}
+/* gère les boutons du slideshow */
+.blockbutton {
+margin-left: 2.5vw;
+margin-top: 1px;
+}
+
+.button1,
+.button2,
+.button3,
+.button4 {
+border-radius: 2em;
+position: relative;
+height: 2vw;
+width: 2vw;
+background-color: salmon;
+margin-left: 0 auto;
+display: inline-block;
+cursor: pointer;
+
+}
+
+.button2 {
+background-color: skyblue;
+}
+
+.button3 {
+background-color: palegreen;
+}
+
+.button4 {
+background-color: pink;
+}
+
+.slide-show-button:hover {
+transition: all ease 0.3s;
+border: solid 0.2em rgba(255, 255, 255, 1);
+}
+
+.slide-show-button:focus,
+.slide-show-button:active {
+transition: all ease 0.1s;
+border: solid 0.3em white;
+}
+
+/* responsive/version mobile */
+
+@media screen and (max-width: 550px) {
+:root {
+font-size: 5vw;
+--cardW: 100vw;
+--cardH: 100vw;
+--cardZInc: 10.5em;
+--ttxt: 0.7em;
+}
+.stack:hover .top,
+.stack:focus .top {
+transform: translateZ(calc(var(--cardZInc)*0))rotateX(0deg);
+transform-origin: center bottom;
+}
+.zoom {
+width: 90vw;
+margin-left: 3vw;
+height: 90vh;
+}
+.texteprojet {
+position: relative;
+width: 70vw;
+float: left;
+}
+iframe {
+width: 100%;
+}
+img {
+height: 100%;
+width: auto;
+}
+.cards {
+grid-template: repeat(12, var(--cardH)) / repeat(1, var(--cardW));
+transform: translate(-0, calc(0 + var(--scroll))) rotateX(0deg) rotateZ(0deg) translateY(calc(0% - var(--scroll)));
+left: 0%;
+top: 25%;
+}
+.titre {
+position: absolute;
+transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0px);
+bottom: 80vh;
+left: 10px;
+white-space: nowrap;
+border: green;
+background-color: none;
+z-index:10;
+}
+.portfolio {
+font-size: 6vw;
+letter-spacing: 0em;
+opacity: 0;
+width: 100vw;
+top: -100px;
+}
+#dg {
+bottom: 5vh;
+}
+#mail {
+background-color: none;
+border: none;
+}
+#nom {
+white-space: nowrap;
+width: 100%;
+font-size: calc(var(--ttxt)*1.7);
+background-color: none;
+border: none;
+}
+#num {
+margin-top: -10vw;
+margin-left: 0vw;
+font-size: calc(var(--ttxt)*1.2);
+position: relative;
+border: 5px solid black;
+color: white;
+background-color: black;
+}
+#nom:hover {
+transition: all 0.5s;
+text-shadow: #FFFFFF 1px 1px, #FFFFFF -1px 1px, #FFFFFF -1px -1px, #FFFFFF 1px -1px, -2px 2px 0, -4px 4px 0, -6px 6px 0, -8px 8px 0, -10px 10px 0, -12px 12px 0, -14px 14px 0;
+}
+iframe {
+width: 100%;
+height: 35vh;
+padding-top: calc(var(--gap)*2);
+}
+.slideshow {
+padding-top: calc(var(--gap)*1);
+overflow: hidden;
+height: auto;
+width: 100%;
+}
+.slide-wrapper {
+width: 500%;
+transition: all 0.3s;
+}
+.slide1 {
+margin-left: 0px;
+}
+.slide2 {
+margin-left: -80vw;
+}
+.slide3 {
+margin-left: -160vw;
+}
+.slide4 {
+margin-left: -240vw;
+}
+.slide {
+border: 2px solid rgba(255, 240, 0, 0);
+float: left;
+height: 55vh;
+width: 80vw;
+}
+.slide-number img {
+border: 0.5vw solid black;
+float: left;
+max-width: 80vw;
+max-height: 55vh;
+width: auto;
+height: auto;
+}
+.slide-number {
+color: #000;
+text-align: center;
+font-size: 10em;
+width: 80vw;
+height: auto;
+}
+.blockbutton {
+margin-top: 1px;
+}
+.button1,
+.button2,
+.button3,
+.button4 {
+border-radius: 4em;
+height: 5vw;
+width: 5vw;
+margin-left: 2.5vw;
+}
+}
+
+@media screen and (min-width: 551px) {
+.portfolio {
+top: -30vh;
+width: 50vw;
+font-size: 3em;
+;
+white-space: wrap;
+text-align: left;
+}
+#nom {
+white-space: nowrap;
+width: 100%;
+}
+#dg {
+margin-top: 10vh;
+}
+.cards {
+grid-template: repeat(6, var(--cardH)) / repeat(2, var(--cardW));
+top: 50%;
+left: 60%;
+}
+:root {
+font-size: 2vw;
+--cardW: 40vw;
+--cardH: 40vw;
+--cardZInc: 0.5em;
+--ttxt: 1em;
+}
+.zoom {
+height: 90vh;
+}
+.titre {
+background-color: white;
+bottom: 61vh;
+left: 6vw;
+}
+@media screen and (min-width: 1050px) {
+.portfolio {
+text-align: center;
+width: 100%;
+height: 40em;
+font: 1em "Rubik Mono One", sans-serif;
+font-size: 1.1em;
+top: calc(-1% - var(--gap)*2);
+}
+.titre {
+bottom: 65vh;
+left: 6vw;
+}
+#nom {
+white-space: normal;
+}
+#dg {
+font-size: calc(var(--ttxt) * 0.7);
+margin-top: 13vw;
+}
+.cards {
+grid-template: repeat(4, var(--cardH)) / repeat(3, var(--cardW));
+top: 35%;
+left: 60%;
+}
+:root {
+font-size: 2vw;
+--cardW: 18vw;
+--cardH: 18vw;
+--cardZInc: 0.5em;
+--ttxt: 0.9em;
+}
+.zoom {
+height: 85vh;
+}
